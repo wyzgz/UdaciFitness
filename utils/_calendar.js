@@ -30,14 +30,12 @@ function setDummyData () {
   }
 
   AsyncStorage.setItem(CALENDAR_STORAGE_KEY, JSON.stringify(dummyData))
-
   return dummyData
 }
 
-function setMissingDates (dates) {
-  const length = Object.keys(dates).length
+function setMissingDates () {
   const timestamp = Date.now()
-
+  let dates = []
   for (let i = -183; i < 0; i++) {
     const time = timestamp + i * 24 * 60 * 60 * 1000
     const strTime = timeToString(time)
@@ -46,12 +44,9 @@ function setMissingDates (dates) {
       dates[strTime] = null
     }
   }
-
   return dates
 }
 
 export function formatCalendarResults (results) {
-  return results === null
-    ? setDummyData()
-    : setMissingDates(JSON.parse(results))
+  return  setDummyData()
 }

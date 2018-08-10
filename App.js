@@ -5,10 +5,11 @@ import { createStore } from 'redux'
 import { Provider } from 'react-redux'
 import reducer from './reducers'
 import History from './components/History'
-import { createMaterialTopTabNavigator } from 'react-navigation'
-import { purple, white ,pink} from './utils/colors'
+import { createMaterialTopTabNavigator,createBottomTabNavigator,createStackNavigator } from 'react-navigation'
+import { purple, white ,lightPurp} from './utils/colors'
 import { FontAwesome, Ionicons } from '@expo/vector-icons'
 import { Constants } from 'expo'
+import EntryDetail from './components/EntryDetail'
 
 function UdaciStatusBar ({backgroundColor, ...props}) {
   return (
@@ -18,28 +19,27 @@ function UdaciStatusBar ({backgroundColor, ...props}) {
   )
 }
 
-const Tabs = createMaterialTopTabNavigator({
+const Tabs = createBottomTabNavigator({
   History: {
     screen: History,
     navigationOptions: {
-      tabBarIcon: ({ tintColor }) => <Ionicons name='ios-bookmarks' size={40} color={tintColor} />
+      tabBarIcon: ({ tintColor }) => <Ionicons name='ios-bookmarks' size={30} color={tintColor} />
     },
   },
   AddEntry: {
     screen: AddEntry,
     navigationOptions: {
-      tabBarIcon: ({ tintColor }) => <FontAwesome name='plus-square' size={40} color={tintColor} />
+      tabBarIcon: ({ tintColor }) => <FontAwesome name='plus-square' size={30} color={tintColor} />
     },
   },
 }, {
   navigationOptions: {
     header: null,
     initialRouteName:'History',
-    tabBarPosition: Platform.OS === 'ios'? 'top':'bottom',
+    tabBarPosition: Platform.OS === 'ios'? 'bottom':'top',
   },
   tabBarOptions: {
-    showIcon: false,
-    showLabel: true,
+    showIcon: Platform.OS === 'ios'? true: false,
     activeTintColor: Platform.OS === 'ios' ? white : purple,
     inactiveTintColor: Platform.OS === 'ios'? 'gray': 'yellow',
     style: {
@@ -56,19 +56,88 @@ const Tabs = createMaterialTopTabNavigator({
     indicatorStyle:{
       backgroundColor: purple
     },
-    labelStyle: {
-      fontSize:18
+  }
+})
+
+
+const TopTabs = createMaterialTopTabNavigator({
+  History: {
+    screen: History,
+    navigationOptions: {
+      tabBarIcon: ({ tintColor }) => <Ionicons name='ios-bookmarks' size={30} color={tintColor} />
+    },
+  },
+  AddEntry: {
+    screen: AddEntry,
+    navigationOptions: {
+      tabBarIcon: ({ tintColor }) => <FontAwesome name='plus-square' size={30} color={tintColor} />
+    },
+  },
+}, {
+  navigationOptions: {
+    header: null,
+    initialRouteName:'History',
+    tabBarPosition: Platform.OS === 'ios'? 'bottom':'top',
+  },
+  tabBarOptions: {
+    showIcon: Platform.OS === 'ios'? true: false,
+    showLabel: true,
+    activeTintColor: Platform.OS === 'ios' ? white : purple,
+    inactiveTintColor: Platform.OS === 'ios'? 'gray': 'yellow',
+    style: {
+      backgroundColor: Platform.OS === 'ios' ? purple : white,
+      shadowColor: 'rgba(0, 0, 0, 0.24)',
+      shadowOffset: {
+        width: 0,
+        height: 3
+      },
+      shadowRadius: 4,
+      shadowOpacity: 3
+    },
+    indicatorStyle:{
+      backgroundColor: purple
+    },
+  }
+})
+const MainNavigator = createStackNavigator({
+  Home: {
+    screen: TopTabs,
+    navigationOptions:{
+      title: 'Home'
+    }
+  },
+  EntryDetail: {
+    screen: EntryDetail,
+  }
+},{
+  initialRouteName: 'Home',
+  navigationOptions:{
+    initialRouteName:'Home',
+    headerTintColor: white,
+    headerStyle:{
+      backgroundColor:purple,
     }
   }
 })
 
+
 export default class App extends React.Component {
+  static navigationOptions = ({navigation}) => {
+    return {
+      title: 'Home',
+      navigationOptions:{
+        headerStyle:{
+          backgroundColor:purple
+        }
+      }
+    }
+  }
   render() {
     return (
       <Provider store={createStore(reducer)}>
         <View style={{flex: 1}}>
           <UdaciStatusBar backgroundColor={purple} barStyle="light-content" />
-          <Tabs />
+          <MainNavigator />
         </View>
       </Provider>
     )
